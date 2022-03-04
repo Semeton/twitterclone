@@ -20,6 +20,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <div class="alert alert-danger" id="loginAlert"></div>
                 <form>
                     <input type="hidden" name="loginActive" id="loginActive" value="1">
                     <fieldset class="from-group">
@@ -59,17 +60,21 @@
 
 $("#toggleLogin").click(function() {
     if ($("#loginActive").val() == "1") {
+
         $("#loginActive").val("0");
         $("#loginModalTitle").html("Sign Up");
         $("#loginSignupButton").html("Sign Up");
         $("#toggleLogin").html("Login");
+
+
     } else {
+
         $("#loginActive").val("1");
         $("#loginModalTitle").html("Login");
         $("#loginSignupButton").html("Login");
         $("#toggleLogin").html("Sign up");
     }
-});
+})
 
 $("#loginSignupButton").click(function() {
     $.ajax({
@@ -78,7 +83,52 @@ $("#loginSignupButton").click(function() {
         data: "email=" + $("#email").val() + "&password=" + $("#password").val() + "&loginActive=" + $(
             "#loginActive").val(),
         success: function(result) {
-            alert(result);
+            if (result == 1) {
+
+                window.location.assign("http://localhost/twitterclone/");
+
+            } else {
+                $("#loginAlert").html(result).show();
+            }
+        }
+    })
+})
+
+$(".toggleFollow").click(function() {
+    var id = $(this).attr("data-userId");
+    $.ajax({
+        type: "POST",
+        url: "actions.php?action=toggleFollow",
+        data: "userId=" + $(this).attr("data-userId"),
+        success: function(result) {
+            if (result == "1") {
+                $("a[data-userId='" + id + "']").html("Follow");
+            } else if (result == '2') {
+                $("a[data-userId='" + id + "']").html("Unfollow");
+            }
+        }
+    })
+})
+
+$("#postTweetButton").click(function() {
+    $.ajax({
+        type: "POST",
+        url: "actions.php?action=postTweet",
+        data: "tweetContent=" + $("#tweetContent").val(),
+        success: function(result) {
+
+            if (result == "1") {
+
+                $("#tweetSuccess").show();
+                $("#tweetFail").hide();
+                window.location.assign("http://localhost/twitterclone/");
+
+
+            } else if (result != "") {
+                $("#tweetFail").html(result).show()
+                $("#tweetSuccess").hide();
+
+            }
         }
     })
 })
